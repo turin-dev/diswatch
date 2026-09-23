@@ -1,0 +1,24 @@
+app/src/main/java/dev/turin/diswatch/protocol/RemoteAuth.kt
+  s_d5f1a50a11dfca::t_300b8dc9965358 66-73
+app/src/main/java/dev/turin/diswatch/WatchModel.kt
+  s_d5f1a50a11dfca::t_2cc2a9fe040219 96,104,110
+  s_d5f1a50a11dfca::t_300b8dc9965358 80,83,86,89-95,97-103,105-109,111-116
+app/build.gradle.kts
+  s_d5f1a50a11dfca::t_300b8dc9965358 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a32fb5d3d4110cee92b0acbde3c78033c367f0b",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
