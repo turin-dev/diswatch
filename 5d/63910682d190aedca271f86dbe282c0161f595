@@ -1,0 +1,77 @@
+.github/workflows/android.yml
+  s_d5f1a50a11dfca::t_1f0c83597ad56e 1-32
+.gitignore
+  s_d5f1a50a11dfca::t_f32df3012a0ef7 1-11
+LICENSE
+  s_d5f1a50a11dfca::t_ef1499e2395e5c 1-21
+README.md
+  s_d5f1a50a11dfca::t_2a9979bb7fd277 1-150
+app/build.gradle.kts
+  s_d5f1a50a11dfca::t_c16b98bb0618af 1-43
+app/proguard-rules.pro
+  s_d5f1a50a11dfca::t_ae0143715d68e3 1-6
+app/src/main/AndroidManifest.xml
+  s_d5f1a50a11dfca::t_c99b79a8bcc550 1-13
+app/src/main/java/dev/turin/diswatch/DisWatchApp.kt
+  s_d5f1a50a11dfca::t_e9154773007c43 1-12
+app/src/main/java/dev/turin/diswatch/MainActivity.kt
+  s_d5f1a50a11dfca::t_21b3221cf28453 1-20
+app/src/main/java/dev/turin/diswatch/WatchModel.kt
+  s_d5f1a50a11dfca::t_c31ff0faba64f0 1-141
+app/src/main/java/dev/turin/diswatch/data/Images.kt
+  s_d5f1a50a11dfca::t_7bd062e9d876dd 1-71
+app/src/main/java/dev/turin/diswatch/data/Models.kt
+  s_d5f1a50a11dfca::t_5fba26670b1a7d 1-43
+app/src/main/java/dev/turin/diswatch/data/Repository.kt
+  s_d5f1a50a11dfca::t_475362fce7ffdd 1-175
+app/src/main/java/dev/turin/diswatch/data/SecureStore.kt
+  s_d5f1a50a11dfca::t_598ec307daf088 1-43
+app/src/main/java/dev/turin/diswatch/protocol/DiscordApi.kt
+  s_d5f1a50a11dfca::t_f94ba657de80ff 1-95
+app/src/main/java/dev/turin/diswatch/protocol/Gateway.kt
+  s_d5f1a50a11dfca::t_24511de5f05394 1-142
+app/src/main/java/dev/turin/diswatch/protocol/RemoteAuth.kt
+  s_d5f1a50a11dfca::t_2065beba4d9c26 1-64
+app/src/main/java/dev/turin/diswatch/protocol/Wire.kt
+  s_d5f1a50a11dfca::t_ec9aad82ac22a2 1-38
+app/src/main/java/dev/turin/diswatch/ui/WatchApp.kt
+  s_d5f1a50a11dfca::t_c79410ac5460c1 1-283
+app/src/main/res/drawable/ic_launcher.xml
+  s_d5f1a50a11dfca::t_e03ba69e411a83 1-4
+app/src/main/res/values/styles.xml
+  s_d5f1a50a11dfca::t_a2c3afe2c2e1d1 1-4
+app/src/test/java/dev/turin/diswatch/MessageReducerTest.kt
+  s_d5f1a50a11dfca::t_c90caedb357424 1-57
+build.gradle.kts
+  s_d5f1a50a11dfca::t_0da4388477b6c8 1-6
+docs/PERFORMANCE.md
+  s_d5f1a50a11dfca::t_d64a056960297c 1-56
+docs/VALIDATION.md
+  s_d5f1a50a11dfca::t_e81b760bb84e8f 1-26
+gradle.properties
+  s_d5f1a50a11dfca::t_20d75ea3ec47e8 1-4
+gradle/wrapper/gradle-wrapper.properties
+  s_d5f1a50a11dfca::t_f24b2bc831bd25 1-8
+gradlew
+  s_d5f1a50a11dfca::t_82cd23f9b3cf4f 1-252
+gradlew.bat
+  s_d5f1a50a11dfca::t_86e2edf5a0922b 1-94
+settings.gradle.kts
+  s_d5f1a50a11dfca::t_ccc79c1d53ef26 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5d63910682d190aedca271f86dbe282c0161f595",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
