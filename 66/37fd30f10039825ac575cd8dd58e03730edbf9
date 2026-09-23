@@ -1,0 +1,23 @@
+app/build.gradle.kts
+  s_d5f1a50a11dfca::t_043d7b75702a15 14-15
+README.md
+  s_d5f1a50a11dfca::t_043d7b75702a15 25
+app/src/main/java/dev/turin/diswatch/protocol/RemoteAuth.kt
+  s_d5f1a50a11dfca::t_247d59babae508 51-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6637fd30f10039825ac575cd8dd58e03730edbf9",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
