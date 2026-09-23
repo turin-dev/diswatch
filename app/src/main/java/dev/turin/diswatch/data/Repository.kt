@@ -62,15 +62,15 @@ class Repository(private val api: DiscordApi, private val vault: SecureStore) {
         persistLater()
     }
     suspend fun updateUnread(channels: List<Channel>) = lock.withLock {
-        unread.value = (unread.value + channel).takeLastBounded(500)s.filter { c ->
+        val newlyUnread = channels.filter { c ->
             val last = c.last_message_id?.toULongOrNull() ?: 0uL
             // First visit establishes a local baseline, not a claim of Discord-wide unread sync.
             val seen = read[c.id]?.toULongOrNull()
             if (seen == null && c.last_message_id != null) read[c.id] = c.last_message_id
             seen != null && last > seen
         }.map { it.id }
+        unread.value = (unread.value + newlyUnread).takeLastBounded(500)
         while (read.size > 500) read.remove(read.keys.first())
-        unread.value = unread.value.takeLastBounded(500)
         persistLater()
     }
     suspend fun event(type: String, data: WireMessage) {
