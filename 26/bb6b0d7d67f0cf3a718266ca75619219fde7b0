@@ -1,0 +1,19 @@
+.github/workflows/codeql.yml
+  s_d5f1a50a11dfca::t_3a182a77fb26cd 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26bb6b0d7d67f0cf3a718266ca75619219fde7b0",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
