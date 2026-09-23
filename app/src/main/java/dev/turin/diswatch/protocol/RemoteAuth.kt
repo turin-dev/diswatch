@@ -63,8 +63,14 @@ class RemoteAuth(private val api: DiscordApi) {
                             onQr("https://discord.com/ra/$fingerprint")
                             onStatus("Discord 앱으로 스캔하고 승인하세요")
                         }
-                        "pending_ticket" -> { onQr(null); onStatus("휴대폰에서 로그인 승인을 기다리는 중") }
-                        "pending_login" -> { val result = api.ticket(requireNotNull(event.ticket)); return@withTimeout decrypt(result.encrypted_token).toString(Charsets.UTF_8) }
+                        "pending_ticket" -> { onQr(null); onStatus("휴대폰 QR 연결 확인 · 최종 승인을 기다리는 중…") }
+                        "pending_login" -> {
+                            onQr(null)
+                            onStatus("승인 완료 · Discord 티켓을 교환하는 중…")
+                            val result = api.ticket(requireNotNull(event.ticket))
+                            onStatus("티켓 수신 · 인증 정보를 해독하는 중…")
+                            return@withTimeout decrypt(result.encrypted_token).toString(Charsets.UTF_8)
+                        }
                         "cancel" -> throw java.io.IOException("로그인이 취소되었습니다")
                     }
                 }
