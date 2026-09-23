@@ -1,0 +1,26 @@
+.github/workflows/codeql.yml
+  s_d5f1a50a11dfca::t_30962435953892 1-28,30-32,36-38
+  s_d5f1a50a11dfca::t_028fc37ce57814 29,33-35
+.github/workflows/android.yml
+  s_d5f1a50a11dfca::t_30962435953892 14-15,19-20,25
+SECURITY.md
+  s_d5f1a50a11dfca::t_30962435953892 1-11
+.github/dependabot.yml
+  s_d5f1a50a11dfca::t_30962435953892 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "886aea6cdd51564a3310f748b12dabc060794f15",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
