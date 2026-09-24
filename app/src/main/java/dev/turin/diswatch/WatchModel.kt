@@ -89,6 +89,7 @@ class WatchModel(application: Application) : AndroidViewModel(application) {
             catch (e: ApiFailure) {
                 val code = e.discordCode?.let { " · Discord 코드 $it" }.orEmpty()
                 loginStatus.value = when {
+                    e.captchaRequired -> "Discord 추가 CAPTCHA 확인 요구 · 이 로그인 흐름에서 처리할 수 없습니다"
                     loginStatus.value.startsWith("승인 완료") -> "승인 후 티켓 교환 거부 (HTTP ${e.status}$code)"
                     loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 거부 (HTTP ${e.status}$code)"
                     else -> "QR 로그인 요청 거부 (HTTP ${e.status}$code)"

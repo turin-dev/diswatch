@@ -37,6 +37,7 @@ class RemoteAuth(private val api: DiscordApi) {
         })
         var heartbeat: Job? = null
         var expiry: Job? = null
+        var sessionFingerprint: String? = null
         try {
             withTimeout(180000) {
                 for (text in events) {
@@ -60,6 +61,7 @@ class RemoteAuth(private val api: DiscordApi) {
                             if (!MessageDigest.isEqual(expected.toByteArray(Charsets.US_ASCII), fingerprint.toByteArray(Charsets.US_ASCII))) {
                                 throw java.io.IOException("Remote auth fingerprint mismatch")
                             }
+                            sessionFingerprint = fingerprint
                             onQr("https://discord.com/ra/$fingerprint")
                             onStatus("Discord 앱으로 스캔하고 승인하세요")
                         }
@@ -67,7 +69,7 @@ class RemoteAuth(private val api: DiscordApi) {
                         "pending_login" -> {
                             onQr(null)
                             onStatus("승인 완료 · Discord 티켓을 교환하는 중…")
-                            val result = api.ticket(requireNotNull(event.ticket))
+                            val result = api.ticket(requireNotNull(event.ticket), requireNotNull(sessionFingerprint))
                             onStatus("티켓 수신 · 인증 정보를 해독하는 중…")
                             return@withTimeout decrypt(result.encrypted_token).toString(Charsets.UTF_8)
                         }
