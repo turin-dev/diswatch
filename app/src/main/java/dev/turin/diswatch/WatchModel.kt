@@ -87,10 +87,11 @@ class WatchModel(application: Application) : AndroidViewModel(application) {
                 resumeNetwork()
             } catch (e: CancellationException) { throw e }
             catch (e: ApiFailure) {
+                val code = e.discordCode?.let { " · Discord 코드 $it" }.orEmpty()
                 loginStatus.value = when {
-                    loginStatus.value.startsWith("승인 완료") -> "승인 후 티켓 교환 거부 (HTTP ${e.status})"
-                    loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 거부 (HTTP ${e.status})"
-                    else -> "QR 로그인 요청 거부 (HTTP ${e.status})"
+                    loginStatus.value.startsWith("승인 완료") -> "승인 후 티켓 교환 거부 (HTTP ${e.status}$code)"
+                    loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 거부 (HTTP ${e.status}$code)"
+                    else -> "QR 로그인 요청 거부 (HTTP ${e.status}$code)"
                 }
             }
             catch (_: java.net.SocketTimeoutException) {

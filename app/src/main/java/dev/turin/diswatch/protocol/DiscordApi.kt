@@ -7,6 +7,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class ApiFailure(val status: Int) : IOException("Discord 요청 실패 ($status)")
+class ApiFailure(val status: Int, val discordCode: Long? = null) : IOException("Discord 요청 실패 ($status)")
 class DiscordApi(val client: OkHttpClient, private val token: () -> String?) {
     private val gate = Mutex()
     private var nextRequestAt = 0L
@@ -72,7 +74,16 @@ class DiscordApi(val client: OkHttpClient, private val token: () -> String?) {
             } else {
                 if (response.header("X-RateLimit-Remaining") == "0") nextRequestAt =
                     android.os.SystemClock.elapsedRealtime() + ((response.header("X-RateLimit-Reset-After")?.toDoubleOrNull() ?: 1.0) * 1000).toLong()
-                if (!response.isSuccessful) { val code = response.code; response.close(); throw ApiFailure(code) }
+                if (!response.isSuccessful) {
+                    val status = response.code
+                    val discordCode = runCatching {
+                        response.peekBody(8192).use { body ->
+                            wireJson.parseToJsonElement(body.string()).jsonObject["code"]?.jsonPrimitive?.content?.toLongOrNull()
+                        }
+                    }.getOrNull()
+                    response.close()
+                    throw ApiFailure(status, discordCode)
+                }
                 return@withLock response
             }
         }
