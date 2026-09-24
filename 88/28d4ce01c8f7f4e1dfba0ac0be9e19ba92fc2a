@@ -1,0 +1,25 @@
+app/src/main/java/dev/turin/diswatch/WatchModel.kt
+  s_d5f1a50a11dfca::t_fc2d28a6712251 92
+app/src/main/java/dev/turin/diswatch/protocol/DiscordApi.kt
+  s_d5f1a50a11dfca::t_fc2d28a6712251 20-24,53-55,59-60,65-66,69,71,86,88-92,96
+app/src/main/java/dev/turin/diswatch/protocol/RemoteAuth.kt
+  s_d5f1a50a11dfca::t_fc2d28a6712251 40,64,72
+app/build.gradle.kts
+  s_d5f1a50a11dfca::t_fc2d28a6712251 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8828d4ce01c8f7f4e1dfba0ac0be9e19ba92fc2a",
+  "prompts": {},
+  "sessions": {
+    "s_d5f1a50a11dfca": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec8-63ad-7e13-871d-a032142b4a4a",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "turin-dev <201305497+turin-dev@users.noreply.github.com>"
+    }
+  }
+}
