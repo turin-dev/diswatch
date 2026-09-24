@@ -37,6 +37,7 @@ class RemoteAuth(private val api: DiscordApi) {
         })
         var heartbeat: Job? = null
         var expiry: Job? = null
+        var sessionFingerprint: String? = null
         try {
             withTimeout(180000) {
                 for (text in events) {
@@ -48,12 +49,30 @@ class RemoteAuth(private val api: DiscordApi) {
                             expiry = launch { delay(event.timeout_ms.coerceIn(1000, 180000)); events.close() }
                         }
                         "nonce_proof" -> {
-                            val hash = MessageDigest.getInstance("SHA-256").digest(decrypt(requireNotNull(event.encrypted_nonce)))
-                            ws.send(buildJsonObject { put("op", "nonce_proof"); put("proof", Base64.encodeToString(hash, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)) }.toString())
+                            val nonce = Base64.encodeToString(decrypt(requireNotNull(event.encrypted_nonce)),
+                                Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                            ws.send(buildJsonObject { put("op", "nonce_proof"); put("nonce", nonce) }.toString())
                         }
-                        "pending_remote_init" -> { onQr("https://discord.com/ra/${requireNotNull(event.fingerprint)}"); onStatus("Discord 앱으로 스캔하고 승인하세요") }
-                        "pending_ticket" -> { onQr(null); onStatus("휴대폰에서 로그인 승인을 기다리는 중") }
-                        "pending_login" -> { val result = api.ticket(requireNotNull(event.ticket)); return@withTimeout decrypt(result.encrypted_token).toString(Charsets.UTF_8) }
+                        "pending_remote_init" -> {
+                            val fingerprint = requireNotNull(event.fingerprint)
+                            val expected = Base64.encodeToString(
+                                MessageDigest.getInstance("SHA-256").digest(pair.public.encoded),
+                                Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                            if (!MessageDigest.isEqual(expected.toByteArray(Charsets.US_ASCII), fingerprint.toByteArray(Charsets.US_ASCII))) {
+                                throw java.io.IOException("Remote auth fingerprint mismatch")
+                            }
+                            sessionFingerprint = fingerprint
+                            onQr("https://discord.com/ra/$fingerprint")
+                            onStatus("Discord 앱으로 스캔하고 승인하세요")
+                        }
+                        "pending_ticket" -> { onQr(null); onStatus("휴대폰 QR 연결 확인 · 최종 승인을 기다리는 중…") }
+                        "pending_login" -> {
+                            onQr(null)
+                            onStatus("승인 완료 · Discord 티켓을 교환하는 중…")
+                            val result = api.ticket(requireNotNull(event.ticket), requireNotNull(sessionFingerprint))
+                            onStatus("티켓 수신 · 인증 정보를 해독하는 중…")
+                            return@withTimeout decrypt(result.encrypted_token).toString(Charsets.UTF_8)
+                        }
                         "cancel" -> throw java.io.IOException("로그인이 취소되었습니다")
                     }
                 }

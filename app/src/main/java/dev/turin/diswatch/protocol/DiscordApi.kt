@@ -7,6 +7,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -15,7 +17,11 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class ApiFailure(val status: Int) : IOException("Discord 요청 실패 ($status)")
+class ApiFailure(
+    val status: Int,
+    val discordCode: Long? = null,
+    val captchaRequired: Boolean = false
+) : IOException("Discord 요청 실패 ($status)")
 class DiscordApi(val client: OkHttpClient, private val token: () -> String?) {
     private val gate = Mutex()
     private var nextRequestAt = 0L
@@ -44,22 +50,25 @@ class DiscordApi(val client: OkHttpClient, private val token: () -> String?) {
         val encoded = java.net.URLEncoder.encode(emoji.route, "UTF-8").replace("+", "%20")
         raw(if (add) "PUT" else "DELETE", "/channels/$channel/messages/$id/reactions/$encoded/@me").close()
     }
-    suspend fun ticket(ticket: String): TokenReply = request("POST", "/users/@me/remote-auth/login",
-        wireJson.encodeToString(TicketBody(ticket)), authenticate = false)
+    suspend fun ticket(ticket: String, fingerprint: String): TokenReply = request(
+        "POST", "/users/@me/remote-auth/login", wireJson.encodeToString(TicketBody(ticket)),
+        authenticate = false, apiVersion = 9, fingerprint = fingerprint)
     private suspend inline fun <reified T> get(path: String): T = request("GET", path)
     @OptIn(ExperimentalSerializationApi::class)
     private suspend inline fun <reified T> request(method: String, path: String, body: String? = null,
-        authenticate: Boolean = true): T = withContext(Dispatchers.IO) {
-        raw(method, path, body, authenticate).use { response ->
+        authenticate: Boolean = true, apiVersion: Int = 10, fingerprint: String? = null): T = withContext(Dispatchers.IO) {
+        raw(method, path, body, authenticate, apiVersion, fingerprint).use { response ->
             wireJson.decodeFromStream<T>(requireNotNull(response.body).byteStream())
         }
     }
     /** Serialize REST calls and respect server Retry-After; never automatically retry ambiguous POST failures. */
-    private suspend fun raw(method: String, path: String, body: String? = null, authenticate: Boolean = true): Response = withContext(Dispatchers.IO) { gate.withLock {
+    private suspend fun raw(method: String, path: String, body: String? = null, authenticate: Boolean = true,
+        apiVersion: Int = 10, fingerprint: String? = null): Response = withContext(Dispatchers.IO) { gate.withLock {
         repeat(4) {
             delay((nextRequestAt - android.os.SystemClock.elapsedRealtime()).coerceAtLeast(0))
-            val request = Request.Builder().url("https://discord.com/api/v10$path")
+            val request = Request.Builder().url("https://discord.com/api/v$apiVersion$path")
                 .header("User-Agent", "DisWatch/0.1 (Wear OS; unofficial)")
+            fingerprint?.let { request.header("X-Fingerprint", it) }
             if (authenticate) request.header("Authorization", token() ?: throw ApiFailure(401))
             request.method(method, if (method in listOf("POST", "PUT", "PATCH"))
                 (body ?: "").toRequestBody("application/json".toMediaType()) else null)
@@ -72,7 +81,20 @@ class DiscordApi(val client: OkHttpClient, private val token: () -> String?) {
             } else {
                 if (response.header("X-RateLimit-Remaining") == "0") nextRequestAt =
                     android.os.SystemClock.elapsedRealtime() + ((response.header("X-RateLimit-Reset-After")?.toDoubleOrNull() ?: 1.0) * 1000).toLong()
-                if (!response.isSuccessful) { val code = response.code; response.close(); throw ApiFailure(code) }
+                if (!response.isSuccessful) {
+                    val status = response.code
+                    val errorDetails = runCatching {
+                        response.peekBody(8192).use { body ->
+                            val json = wireJson.parseToJsonElement(body.string()).jsonObject
+                            val code = json["code"]?.jsonPrimitive?.content?.toLongOrNull()
+                            val captcha = listOf("captcha_key", "captcha_sitekey", "captcha_rqtoken")
+                                .any(json::containsKey)
+                            code to captcha
+                        }
+                    }.getOrNull()
+                    response.close()
+                    throw ApiFailure(status, errorDetails?.first, errorDetails?.second ?: false)
+                }
                 return@withLock response
             }
         }

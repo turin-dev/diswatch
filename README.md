@@ -22,7 +22,7 @@ Discord의 [일반 사용자 계정 자동화 안내](https://support.discord.co
 
 | 기능 | 소스 구현 / 현재 제한 |
 | --- | --- |
-| QR 로그인 | ephemeral RSA-2048/OAEP SHA-256, nonce proof, 티켓 교환, 만료/취소 처리; 실서비스 미검증 |
+| QR 로그인 | ephemeral RSA-2048/OAEP SHA-256, base64url nonce proof, fingerprint 검증, 티켓 교환; 실서비스 미검증 |
 | 로그인 저장 | Android Keystore AES-GCM, no-backup private 파일, atomic write |
 | 서버 목록 | REST 100개씩 pagination, 최대 1,000개 |
 | 채널 목록 | 일반 텍스트/공지 채널, position 정렬; 채널 권한 최종 판정은 REST 403 |

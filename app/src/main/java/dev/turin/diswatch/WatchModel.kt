@@ -77,13 +77,45 @@ class WatchModel(application: Application) : AndroidViewModel(application) {
             try {
                 loginStatus.value = "QR 생성 중…"
                 val received = RemoteAuth(api).login({ qr.value = it }, { loginStatus.value = it })
+                loginStatus.value = "Discord 계정 확인 중…"
                 token = received
                 try { repository.identify() } catch (e: Exception) { token = null; throw e }
+                loginStatus.value = "로그인 정보를 안전하게 저장 중…"
                 withContext(Dispatchers.IO) { vault.write("token", received.toByteArray()) }
                 authenticated.value = true
+                loginStatus.value = "로그인 완료"
                 resumeNetwork()
             } catch (e: CancellationException) { throw e }
-            catch (_: Exception) { loginStatus.value = "로그인하지 못했습니다. QR을 다시 생성하세요." }
+            catch (e: ApiFailure) {
+                val code = e.discordCode?.let { " · Discord 코드 $it" }.orEmpty()
+                loginStatus.value = when {
+                    e.captchaRequired -> "Discord 추가 CAPTCHA 확인 요구 · 이 로그인 흐름에서 처리할 수 없습니다"
+                    loginStatus.value.startsWith("승인 완료") -> "승인 후 티켓 교환 거부 (HTTP ${e.status}$code)"
+                    loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 거부 (HTTP ${e.status}$code)"
+                    else -> "QR 로그인 요청 거부 (HTTP ${e.status}$code)"
+                }
+            }
+            catch (_: java.net.SocketTimeoutException) {
+                loginStatus.value = when {
+                    loginStatus.value.startsWith("휴대폰 QR 연결") -> "최종 승인 응답 시간 초과 · QR을 다시 생성하세요"
+                    loginStatus.value.startsWith("승인 완료") -> "승인 뒤 티켓 교환 시간 초과"
+                    loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 시간 초과"
+                    else -> "로그인 서버 응답 시간 초과 · 다시 시도하세요"
+                }
+            }
+            catch (_: java.io.IOException) {
+                loginStatus.value = when {
+                    loginStatus.value.startsWith("휴대폰 QR 연결") -> "최종 승인 대기 중 연결이 종료됨 · 다시 시도하세요"
+                    loginStatus.value.startsWith("승인 완료") -> "승인 뒤 티켓 교환 중 네트워크 오류"
+                    loginStatus.value.startsWith("티켓 수신") -> "인증 정보 해독 실패 · QR을 다시 생성하세요"
+                    loginStatus.value.startsWith("Discord 계정 확인") -> "인증 뒤 계정 확인 중 네트워크 오류"
+                    loginStatus.value.startsWith("로그인 정보를") -> "로그인 정보 저장 실패 · 다시 로그인하세요"
+                    else -> "QR 로그인 연결 오류 · 다시 시도하세요"
+                }
+            }
+            catch (e: Exception) {
+                loginStatus.value = "로그인 처리 오류 (${e::class.simpleName ?: "예외"})"
+            }
         }
     }
     fun selectGuild(guild: Guild) {
