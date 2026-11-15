@@ -44,8 +44,8 @@ DM 탐색, Markdown/멘션 이름 변환, 커스텀 이모지 이미지 렌더�
 ## Android Studio에서 빌드
 
 - JDK **17**
-- Android SDK Platform **35**, Build Tools **35.0.0**
-- AGP **8.9.2**, Gradle **8.11.1**, Kotlin **2.4.20** (버전 고정)
+- Android SDK Platform **35**, Build Tools **36.0.0**
+- AGP **9.4.1**, Gradle **9.6.0**, Kotlin **2.4.20** (버전 고정)
 - 최소 Android API **30**, watch 하드웨어 필수
 
 이 폴더를 Android Studio에서 Open 후 SDK 설정 및 Sync를 실행합니다. `local.properties`는
